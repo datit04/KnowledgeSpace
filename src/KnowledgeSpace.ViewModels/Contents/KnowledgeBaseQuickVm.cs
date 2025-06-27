@@ -13,5 +13,7 @@
 		public string SeoAlias { get; set; }
 
 		public string Description { get; set; }
+
+		public int? ViewCount { get; set; }
 	}
 }

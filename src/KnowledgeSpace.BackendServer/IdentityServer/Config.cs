@@ -61,9 +61,9 @@ namespace KnowledgeSpace.BackendServer.IdentityServer
 					AllowAccessTokensViaBrowser = true,
 					RequireConsent = false,
 
-					RedirectUris =           { "https://localhost:5000/swagger/oauth2-redirect.html" },
-					PostLogoutRedirectUris = { "https://localhost:5000/swagger/oauth2-redirect.html" },
-					AllowedCorsOrigins =     { "https://localhost:5000" },
+					RedirectUris =           { "https://localhost:5001/swagger/oauth2-redirect.html" },
+					PostLogoutRedirectUris = { "https://localhost:5001/swagger/oauth2-redirect.html" },
+					AllowedCorsOrigins =     { "https://localhost:5001" },
 
 					AllowedScopes = new List<string>
 					{

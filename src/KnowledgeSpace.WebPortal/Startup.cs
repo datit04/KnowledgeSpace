@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Logging;
+﻿using KnowledgeSpace.WebPortal.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 
 namespace KnowledgeSpace.WebPortal
@@ -15,7 +16,9 @@ namespace KnowledgeSpace.WebPortal
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			IdentityModelEventSource.ShowPII = true; //Add this line
+
+			services.AddHttpClient();
+			//IdentityModelEventSource.ShowPII = true; //Add this line
 			services.AddAuthentication(options =>
 			{
 				options.DefaultScheme = "Cookies";
@@ -51,6 +54,12 @@ namespace KnowledgeSpace.WebPortal
 			{
 				builder.AddRazorRuntimeCompilation();
 			}
+
+			//Declare DI containers
+			services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+			services.AddTransient<ICategoryApiClient, CategoryApiClient>();
+			services.AddTransient<IKnowledgeBaseApiClient, KnowledgeBaseApiClient>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,4 +1,5 @@
 using KnowledgeSpace.WebPortal.Models;
+using KnowledgeSpace.WebPortal.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -7,14 +8,19 @@ namespace KnowledgeSpace.WebPortal.Controllers
 	public class HomeController : Controller
 	{
 		private readonly ILogger<HomeController> _logger;
+		private readonly IKnowledgeBaseApiClient _knowledgeBaseApiClient;
 
-		public HomeController(ILogger<HomeController> logger)
+		public HomeController(ILogger<HomeController> logger,
+			IKnowledgeBaseApiClient knowledgeBaseApiClient)
 		{
 			_logger = logger;
+			_knowledgeBaseApiClient = knowledgeBaseApiClient;
 		}
 
-		public IActionResult Index()
+		public async Task<IActionResult> Index()
 		{
+			var latestKbs = await _knowledgeBaseApiClient.GetLatestKnowledgeBases(6);
+			var popularKbs = await _knowledgeBaseApiClient.GetPopularKnowledgeBases(6);
 			return View();
 		}
 
