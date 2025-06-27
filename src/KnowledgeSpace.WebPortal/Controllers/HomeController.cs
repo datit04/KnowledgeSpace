@@ -20,7 +20,7 @@ namespace KnowledgeSpace.WebPortal.Controllers
 		public async Task<IActionResult> Index()
 		{
 			var latestKbs = await _knowledgeBaseApiClient.GetLatestKnowledgeBases(6);
-			//var popularKbs = await _knowledgeBaseApiClient.GetPopularKnowledgeBases(6);
+			var popularKbs = await _knowledgeBaseApiClient.GetPopularKnowledgeBases(6);
 			return View();
 		}
 
