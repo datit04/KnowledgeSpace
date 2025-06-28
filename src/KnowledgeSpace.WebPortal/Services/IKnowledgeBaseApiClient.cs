@@ -18,5 +18,7 @@ namespace KnowledgeSpace.WebPortal.Services
 		Task<KnowledgeBaseVm> GetKnowledgeBaseDetail(int id);
 
 		Task<List<LabelVm>> GetLabelsByKnowledgeBaseId(int id);
+
+		Task<List<CommentVm>> GetRecentComments(int take);
 	}
 }
