@@ -60,6 +60,8 @@ namespace KnowledgeSpace.WebPortal
 
 			services.AddTransient<ICategoryApiClient, CategoryApiClient>();
 			services.AddTransient<IKnowledgeBaseApiClient, KnowledgeBaseApiClient>();
+			services.AddTransient<ILabelApiClient, LabelApiClient>();
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,6 +86,11 @@ namespace KnowledgeSpace.WebPortal
 
 			app.UseEndpoints(endpoints =>
 			{
+				endpoints.MapControllerRoute(
+				name: "List By Tag Id",
+				pattern: "/tag/{tagId}",
+				new { controller = "KnowledgeBase", action = "ListByTag" });
+
 				endpoints.MapControllerRoute(
 				 name: "Search KB",
 				 pattern: "/search",
