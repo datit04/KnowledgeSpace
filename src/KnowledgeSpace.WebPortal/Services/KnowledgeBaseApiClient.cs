@@ -19,6 +19,15 @@ namespace KnowledgeSpace.WebPortal.Services
 			_httpContextAccessor = httpContextAccessor;
 		}
 
+		public async Task<KnowledgeBaseVm> GetKnowledgeBaseDetail(int id)
+		{
+			var client = _httpClientFactory.CreateClient();
+			client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
+			var response = await client.GetAsync($"/api/knowledgeBases/{id}");
+			var knowledgeBase = JsonConvert.DeserializeObject<KnowledgeBaseVm>(await response.Content.ReadAsStringAsync());
+			return knowledgeBase = JsonConvert.DeserializeObject<KnowledgeBaseVm>(await response.Content.ReadAsStringAsync());
+		}
+
 		public async Task<Pagination<KnowledgeBaseQuickVm>> GetKnowledgeBasesByCategoryId(int categoryId, int pageIndex, int pageSize)
 		{
 			var apiUrl = $"/api/knowledgeBases/filter?categoryId={categoryId}&pageIndex={pageIndex}&pageSize={pageSize}";
@@ -29,12 +38,19 @@ namespace KnowledgeSpace.WebPortal.Services
 			return knowledgeBases;
 		}
 
+		public async Task<List<LabelVm>> GetLabelsByKnowledgeBaseId(int id)
+		{
+			var client = _httpClientFactory.CreateClient();
+			client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
+			var response = await client.GetAsync($"/api/knowledgeBases/{id}/labels");
+			var labels = JsonConvert.DeserializeObject<List<LabelVm>>(await response.Content.ReadAsStringAsync());
+			return labels;
+		}
+
 		public async Task<List<KnowledgeBaseQuickVm>> GetLatestKnowledgeBases(int take)
 		{
 			var client = _httpClientFactory.CreateClient();
 			client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
-			//var token = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-			//client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			var response = await client.GetAsync($"/api/knowledgeBases/latest/{take}");
 			var latestKnowledgeBases = JsonConvert.DeserializeObject<List<KnowledgeBaseQuickVm>>(await response.Content.ReadAsStringAsync());
 			return latestKnowledgeBases;
@@ -44,8 +60,6 @@ namespace KnowledgeSpace.WebPortal.Services
 		{
 			var client = _httpClientFactory.CreateClient();
 			client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
-			//var token = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-			//client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			var response = await client.GetAsync($"/api/knowledgeBases/popular/{take}");
 			var latestKnowledgeBases = JsonConvert.DeserializeObject<List<KnowledgeBaseQuickVm>>(await response.Content.ReadAsStringAsync());
 			return latestKnowledgeBases;
@@ -55,8 +69,6 @@ namespace KnowledgeSpace.WebPortal.Services
 		{
 			var client = _httpClientFactory.CreateClient();
 			client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
-			//var token = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-			//client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			var response = await client.GetAsync($"/api/labels/popular/{take}");
 			var labels = JsonConvert.DeserializeObject<List<LabelVm>>(await response.Content.ReadAsStringAsync());
 			return labels;
