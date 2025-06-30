@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "mustache.js@3.1.0",
+      "destination": "wwwroot/lib/mustache",
+      "files": [
+        "mustache.min.js"
+      ]
+    },
+    {
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/lib/jquery"
+    }
+  ]
+}

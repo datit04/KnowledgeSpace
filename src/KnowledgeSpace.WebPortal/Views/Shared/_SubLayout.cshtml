@@ -1,9 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@section scripts {
-    @RenderSection("scripts", required: false)
-}
+
 <div class="container">
     <div class="row">
         @RenderBody()
@@ -12,3 +10,6 @@
         <!-- end of sidebar -->
     </div>
 </div>
+
+<!-- ✅ Đặt ở cuối file -->
+@RenderSection("scripts", required: false)

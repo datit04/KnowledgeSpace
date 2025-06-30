@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace KnowledgeSpace.WebPortal.Services
 {
@@ -47,6 +48,23 @@ namespace KnowledgeSpace.WebPortal.Services
 			var body = await response.Content.ReadAsStringAsync();
 			var data = JsonConvert.DeserializeObject<T>(body);
 			return data;
+		}
+
+		public async Task<bool> PostAsync<T>(string url, T requestContent, bool requiredLogin = true)
+		{
+			var client = _httpClientFactory.CreateClient();
+			client.BaseAddress = new Uri(_configuration["BackendApiUrl"]);
+
+			var json = JsonConvert.SerializeObject(requestContent);
+			var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+			if (requiredLogin)
+			{
+				var token = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+				client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+			}
+			var response = await client.PostAsync(url, httpContent);
+			return response.IsSuccessStatusCode;
 		}
 	}
 }

@@ -19,5 +19,9 @@
 		public DateTime CreateDate { get; set; }
 
 		public DateTime? LastModifiedDate { get; set; }
+
+		public int? ReplyId { get; set; }
+
+		public List<CommentVm> Children { get; set; } = new List<CommentVm>();
 	}
 }

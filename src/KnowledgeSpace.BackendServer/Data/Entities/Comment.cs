@@ -25,5 +25,7 @@ namespace KnowledgeSpace.BackendServer.Data.Entities
 
 		public DateTime CreateDate { get; set; }
 		public DateTime? LastModifiedDate { get; set; }
+
+		public int? ReplyId { get; set; }
 	}
 }
