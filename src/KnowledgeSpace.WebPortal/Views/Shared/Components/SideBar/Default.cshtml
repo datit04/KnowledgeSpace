@@ -1,6 +1,14 @@
 ﻿@model SideBarViewModel
 <aside class="span4 page-sidebar">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <section class="widget">
+            <div class="body-section">
+                <a class="btn btn-success new-kb" href="/new-kb">Đăng bài mới</a>
+            </div>
 
+        </section>
+    }
     <section class="widget">
         <div class="support-widget">
             <h3 class="title">Hỗ trợ</h3>

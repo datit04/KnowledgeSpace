@@ -5,10 +5,8 @@
     Layout = "_SubLayout";
 }
 @section scripts {
-    <script src="~/lib/jquery/jquery.min.js"></script>         <!-- ✅ jQuery trước -->
-    <script src="~/lib/mustache/mustache.min.js"></script>     <!-- mustache sau -->
-    <script src="~/js/controllers/knowledgeBaseController.js"></script> <!-- sau cùng -->
-
+    <script src="~/lib/mustache.js/mustache.min.js"></script>
+    <script src="~/js/controllers/knowledgeBaseController.js" asp-append-version="true"></script>
     <script>
         var controller = new knowledgeBaseController();
         controller.initialize();
