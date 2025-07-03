@@ -5,13 +5,16 @@ namespace KnowledgeSpace.ViewModels.Contents
 {
 	public class KnowledgeBaseCreateRequest
 	{
+		public int? Id { get; set; }
+
 		[Display(Name = "Danh mục")]
 		public int CategoryId { get; set; }
 
 		[Display(Name = "Tiêu đề")]
 		public string Title { get; set; }
 
-		public string SeoAlias { get; set; }
+		public string? SeoAlias { get; set; }
+
 
 		[Display(Name = "Mô tả")]
 		public string Description { get; set; }
@@ -35,9 +38,11 @@ namespace KnowledgeSpace.ViewModels.Contents
 		public string Note { get; set; }
 
 		[Display(Name = "Nhãn")]
-		public string[] Labels { get; set; }
+		public string[] Labels { get; set; } = Array.Empty<string>();
+
 
 		[Display(Name = "Tệp đính kèm")]
-		public List<IFormFile> Attachments { get; set; }
+		public List<IFormFile> Attachments { get; set; } = new();
+
 	}
 }
