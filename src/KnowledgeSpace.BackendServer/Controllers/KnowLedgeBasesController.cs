@@ -339,7 +339,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
 			if (knowledgeBase == null)
 				return NotFound();
 			if (knowledgeBase.ViewCount == null)
-				knowledgeBase.ViewCount = 1;
+				knowledgeBase.ViewCount = 0;
 
 			knowledgeBase.ViewCount += 1;
 			_context.KnowledgeBases.Update(knowledgeBase);

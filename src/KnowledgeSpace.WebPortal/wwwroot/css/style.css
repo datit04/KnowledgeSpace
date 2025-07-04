@@ -37,7 +37,9 @@
 	color: red;
 }
 
-
+.text-area{
+	width:97%;
+}
 .like-it {
 	background: none;
 	border: none;
