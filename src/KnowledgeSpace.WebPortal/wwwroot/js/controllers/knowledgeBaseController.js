@@ -6,7 +6,6 @@
     };
 
     function registerEvents() {
-        // this is the id of the form
         $("#commentform").submit(function (e) {
             e.preventDefault(); // avoid to execute the actual submit of the form.
             var form = $(this);
