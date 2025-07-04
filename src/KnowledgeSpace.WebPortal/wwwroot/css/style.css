@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Theme Name: Knowledge Base Theme
 	Theme URI: http://knowledgebase.inspirythemes.com/
 	Description: A Knowledge Base theme for WordPress.
@@ -35,4 +35,14 @@
 
 .validation-summary-errors {
 	color: red;
+}
+
+
+.like-it {
+	background: none;
+	border: none;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	padding: 0;
 }

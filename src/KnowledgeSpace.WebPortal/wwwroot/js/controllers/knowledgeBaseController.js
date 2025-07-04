@@ -74,8 +74,8 @@
             e.preventDefault();
             var form = $(this);
             $.post('/knowledgeBase/vote', form.serialize()).done(function (response) {
-                $('.like-it').text(response);
-                $('.like-count').text(response);
+                form.find('.like-it').text(response); // chỉ cập nhật trong nút vote
+                $('#main_like_count_' + form.find('[name="knowledgeBaseId"]').val()).text(response); // chỉ cập nhật số chính
             });
         });
         $('#frm_vote .like-it').click(function () {

@@ -7,7 +7,6 @@
 @section scripts {
     <script src="~/lib/mustache/mustache.min.js"></script>
     <script src="~/js/controllers/knowledgeBaseController.js" asp-append-version="true"></script>
-    <script src="~/js/controllers/knowledgeBaseController.js" asp-append-version="true"></script>
     <script>
         var controller = new knowledgeBaseController();
         controller.initialize();
@@ -63,9 +62,9 @@
     <div class="like-btn">
         @if (User.Identity.IsAuthenticated)
         {
-            <form id="frm_vote" action="#" method="post">
+            <form id="frm_vote" action="javascript:void(0);" method="post">
                 <input type="hidden" name="knowledgeBaseId" value="@Model.Detail.Id">
-                <span class="like-it">@Model.Detail.NumberOfVotes.GetValueOrDefault(0).ToString("N0")</span>
+                <button type="submit" class="like-it">@Model.Detail.NumberOfVotes.GetValueOrDefault(0).ToString("N0")</button>
             </form>
         }
 
