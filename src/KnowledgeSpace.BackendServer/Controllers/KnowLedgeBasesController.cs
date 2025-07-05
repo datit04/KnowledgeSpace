@@ -102,7 +102,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 				CategoryId = u.CategoryId,
 				Description = u.Description,
 				SeoAlias = u.SeoAlias,
-				Title = u.Title
+				Title = u.Title,
+				ViewCount = u.ViewCount
 			}).ToListAsync();
 
 			return Ok(knowledgeBasevms);
@@ -128,7 +129,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 					CategoryAlias = u.c.SeoAlias,
 					CategoryName = u.c.Name,
 					NumberOfVotes = u.k.NumberOfVotes,
-					CreateDate = u.k.CreateDate
+					CreateDate = u.k.CreateDate,
+					ViewCount = u.k.ViewCount
 				}).ToListAsync();
 
 			return Ok(knowledgeBasevms);
@@ -154,7 +156,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 					CategoryAlias = u.c.SeoAlias,
 					CategoryName = u.c.Name,
 					NumberOfVotes = u.k.NumberOfVotes,
-					CreateDate = u.k.CreateDate
+					CreateDate = u.k.CreateDate,
+					ViewCount = u.k.ViewCount
 				}).ToListAsync();
 
 			return Ok(knowledgeBasevms);
@@ -189,6 +192,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
 					CategoryName = u.c.Name,
 					NumberOfVotes = u.k.NumberOfVotes,
 					CreateDate = u.k.CreateDate,
+					ViewCount = u.k.ViewCount,
 					NumberOfComments = u.k.NumberOfComments
 				})
 				.ToListAsync();
@@ -228,7 +232,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 					CategoryName = u.c.Name,
 					NumberOfVotes = u.k.NumberOfVotes,
 					CreateDate = u.k.CreateDate,
-					NumberOfComments = u.k.NumberOfComments
+					NumberOfComments = u.k.NumberOfComments,
+					ViewCount = u.k.ViewCount
 				})
 				.ToListAsync();
 

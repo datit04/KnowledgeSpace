@@ -309,7 +309,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 				   CategoryAlias = u.c.SeoAlias,
 				   CategoryName = u.c.Name,
 				   NumberOfVotes = u.k.NumberOfVotes,
-				   CreateDate = u.k.CreateDate
+				   CreateDate = u.k.CreateDate,
+				   ViewCount = u.k.ViewCount
 			   }).ToListAsync();
 
 			var pagination = new Pagination<KnowledgeBaseQuickVm>
