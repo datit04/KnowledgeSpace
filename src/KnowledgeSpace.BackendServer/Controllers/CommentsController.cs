@@ -3,8 +3,10 @@ using KnowledgeSpace.BackendServer.Constants;
 using KnowledgeSpace.BackendServer.Data.Entities;
 using KnowledgeSpace.BackendServer.Extensions;
 using KnowledgeSpace.BackendServer.Helpers;
+using KnowledgeSpace.BackendServer.Models;
 using KnowledgeSpace.ViewModels;
 using KnowledgeSpace.ViewModels.Contents;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +33,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 				query = query.Where(x => x.c.Content.Contains(filter));
 			}
 			var totalRecords = await query.CountAsync();
-			var items = await query.Skip((pageIndex - 1) * pageSize)
+			var items = await query.OrderByDescending(x => x.c.CreateDate)
+				.Skip((pageIndex - 1) * pageSize)
 				.Take(pageSize)
 				.Select(c => new CommentVm()
 				{
@@ -76,29 +79,49 @@ namespace KnowledgeSpace.BackendServer.Controllers
 		}
 
 		[HttpPost("{knowledgeBaseId}/comments")]
-		[ClaimRequirement(FunctionCode.CONTENT_COMMENT, CommandCode.CREATE)]
 		[ApiValidationFilter]
 		public async Task<IActionResult> PostComment(int knowledgeBaseId, [FromBody] CommentCreateRequest request)
 		{
 			var comment = new Comment()
 			{
 				Content = request.Content,
-				KnowledgeBaseId = request.KnowledgeBaseId,
-				OwnerUserId = User.GetUserId()
+				KnowledgeBaseId = knowledgeBaseId,
+				OwnerUserId = User.GetUserId(),
+				ReplyId = request.ReplyId
 			};
 			_context.Comments.Add(comment);
 
 			var knowledgeBase = await _context.KnowledgeBases.FindAsync(knowledgeBaseId);
-			if (knowledgeBase != null)
+			if (knowledgeBase == null)
 				return BadRequest(new ApiBadRequestResponse($"Cannot found knowledge base with id: {knowledgeBaseId}"));
 
-			knowledgeBase.NumberOfComments = knowledgeBase.NumberOfVotes.GetValueOrDefault(0) + 1;
+			knowledgeBase.NumberOfComments = knowledgeBase.NumberOfComments.GetValueOrDefault(0) + 1;
 			_context.KnowledgeBases.Update(knowledgeBase);
 
 			var result = await _context.SaveChangesAsync();
 			if (result > 0)
 			{
-				return CreatedAtAction(nameof(GetCommentDetail), new { id = knowledgeBaseId, commentId = comment.Id }, request);
+				//Send mail
+				if (comment.ReplyId.HasValue)
+				{
+					var repliedComment = await _context.Comments.FindAsync(comment.ReplyId.Value);
+					var repledUser = await _context.Users.FindAsync(repliedComment.OwnerUserId);
+					var emailModel = new RepliedCommentVm()
+					{
+						CommentContent = request.Content,
+						KnowledeBaseId = knowledgeBaseId,
+						KnowledgeBaseSeoAlias = knowledgeBase.SeoAlias,
+						KnowledgeBaseTitle = knowledgeBase.Title,
+						RepliedName = repledUser.FirstName + " " + repledUser.LastName
+					};
+					//https://github.com/leemunroe/responsive-html-email-template
+					var htmlContent = await _viewRenderService.RenderToStringAsync("_RepliedCommentEmail", emailModel);
+					await _emailSender.SendEmailAsync(repledUser.Email, "Có người đang trả lời bạn", htmlContent);
+				}
+				return CreatedAtAction(nameof(GetCommentDetail), new { id = knowledgeBaseId, commentId = comment.Id }, new CommentVm()
+				{
+					Id = comment.Id
+				});
 			}
 			else
 			{
@@ -140,10 +163,10 @@ namespace KnowledgeSpace.BackendServer.Controllers
 			_context.Comments.Remove(comment);
 
 			var knowledgeBase = await _context.KnowledgeBases.FindAsync(knowledgeBaseId);
-			if (knowledgeBase != null)
+			if (knowledgeBase == null)
 				return BadRequest(new ApiBadRequestResponse($"Cannot found knowledge base with id: {knowledgeBaseId}"));
 
-			knowledgeBase.NumberOfComments = knowledgeBase.NumberOfVotes.GetValueOrDefault(0) - 1;
+			knowledgeBase.NumberOfComments = knowledgeBase.NumberOfComments.GetValueOrDefault(0) - 1;
 			_context.KnowledgeBases.Update(knowledgeBase);
 
 			var result = await _context.SaveChangesAsync();
@@ -161,6 +184,67 @@ namespace KnowledgeSpace.BackendServer.Controllers
 				return Ok(commentVm);
 			}
 			return BadRequest(new ApiBadRequestResponse($"Delete comment failed"));
+		}
+
+		[HttpGet("comments/recent/{take}")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetRecentComments(int take)
+		{
+			var query = from c in _context.Comments
+						join u in _context.Users
+							on c.OwnerUserId equals u.Id
+						join k in _context.KnowledgeBases
+						on c.KnowledgeBaseId equals k.Id
+						orderby c.CreateDate descending
+						select new { c, u, k };
+
+			var comments = await query.Take(take).Select(x => new CommentVm()
+			{
+				Id = x.c.Id,
+				CreateDate = x.c.CreateDate,
+				KnowledgeBaseId = x.c.KnowledgeBaseId,
+				OwnerUserId = x.c.OwnerUserId,
+				KnowledgeBaseTitle = x.k.Title,
+				OwnerName = x.u.FirstName + " " + x.u.LastName,
+				KnowledgeBaseSeoAlias = x.k.SeoAlias
+			}).ToListAsync();
+
+			return Ok(comments);
+		}
+
+		[HttpGet("{knowledgeBaseId}/comments/tree")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetCommentTreeByKnowledgeBaseId(int knowledgeBaseId)
+		{
+			var query = from c in _context.Comments
+						join u in _context.Users
+							on c.OwnerUserId equals u.Id
+						where c.KnowledgeBaseId == knowledgeBaseId
+						select new { c, u };
+
+			var flatComments = await query.Select(x => new CommentVm()
+			{
+				Id = x.c.Id,
+				Content = x.c.Content,
+				CreateDate = x.c.CreateDate,
+				KnowledgeBaseId = x.c.KnowledgeBaseId,
+				OwnerUserId = x.c.OwnerUserId,
+				OwnerName = x.u.FirstName + " " + x.u.LastName,
+				ReplyId = x.c.ReplyId
+			}).ToListAsync();
+
+			var lookup = flatComments.ToLookup(c => c.ReplyId);
+			var rootCategories = flatComments.Where(x => x.ReplyId == null);
+
+			foreach (var c in rootCategories)//only loop through root categories
+			{
+				// you can skip the check if you want an empty list instead of null
+				// when there is no children
+				if (lookup.Contains(c.Id))
+					c.Children = lookup[c.Id].ToList();
+			}
+
+			return Ok(rootCategories);
 		}
 
 		#endregion Comments

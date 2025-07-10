@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Theme Name: Knowledge Base Theme
 	Theme URI: http://knowledgebase.inspirythemes.com/
 	Description: A Knowledge Base theme for WordPress.
@@ -10,3 +10,41 @@
 	Tags: custom-background, threaded-comments, translation-ready, white, one-column, two-columns, three-columns, four-columns, custom-menu, theme-options, flexible-width, full-width-template, featured-images, right-sidebar
 
 	----------------------------------------------------------------------------------------------------------------*/
+.body-section {
+	padding: 10px;
+}
+
+	.body-section a.new-kb {
+		width: 90%;
+		height: 32px;
+		font-size: 20px;
+		padding: 14px 10px 10px 10px;
+	}
+
+.field-validation-error {
+	color: red;
+}
+
+.cke {
+	margin-bottom: 10px !important;
+}
+
+.error {
+	color: red;
+}
+
+.validation-summary-errors {
+	color: red;
+}
+
+.text-area{
+	width:97%;
+}
+.like-it {
+	background: none;
+	border: none;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	padding: 0;
+}

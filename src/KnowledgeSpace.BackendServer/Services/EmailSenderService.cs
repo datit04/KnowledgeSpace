@@ -6,7 +6,11 @@ namespace KnowledgeSpace.BackendServer.Services
 	{
 		public Task SendEmailAsync(string email, string subject, string htmlMessage)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"[DEV MODE] Email to: {email}, Subject: {subject}");
+			// hoặc dùng logger nếu có sẵn
+			// _logger.LogInformation($"[DEV MODE] Email to: {email}, Subject: {subject}");
+			return Task.CompletedTask;
 		}
+
 	}
 }

@@ -8,6 +8,7 @@ using KnowledgeSpace.BackendServer.Services;
 using KnowledgeSpace.ViewModels;
 using KnowledgeSpace.ViewModels.Contents;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
@@ -20,16 +21,22 @@ namespace KnowledgeSpace.BackendServer.Controllers
 		private readonly ISequenceService _sequenceService;
 		private readonly IStorageService _storageService;
 		private readonly ILogger<KnowledgeBasesController> _logger;
+		private readonly IEmailSender _emailSender;
+		private readonly IViewRenderService _viewRenderService;
 
 		public KnowledgeBasesController(ApplicationDbContext context,
 			ISequenceService sequenceService,
 			IStorageService storageService,
-			ILogger<KnowledgeBasesController> logger)
+			ILogger<KnowledgeBasesController> logger,
+			IEmailSender emailSender,
+			IViewRenderService viewRenderService)
 		{
 			_context = context;
 			_sequenceService = sequenceService;
 			_storageService = storageService;
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_emailSender = emailSender;
+			_viewRenderService = viewRenderService;
 		}
 
 		[HttpPost]
@@ -95,7 +102,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 				CategoryId = u.CategoryId,
 				Description = u.Description,
 				SeoAlias = u.SeoAlias,
-				Title = u.Title
+				Title = u.Title,
+				ViewCount = u.ViewCount
 			}).ToListAsync();
 
 			return Ok(knowledgeBasevms);
@@ -105,18 +113,25 @@ namespace KnowledgeSpace.BackendServer.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> GetLatestKnowledgeBases(int take)
 		{
-			var knowledgeBases = _context.KnowledgeBases
-				.OrderByDescending(x => x.CreateDate)
-				.Take(take);
+			var knowledgeBases = from k in _context.KnowledgeBases
+								 join c in _context.Categories on k.CategoryId equals c.Id
+								 orderby k.CreateDate descending
+								 select new { k, c };
 
-			var knowledgeBasevms = await knowledgeBases.Select(u => new KnowledgeBaseQuickVm()
-			{
-				Id = u.Id,
-				CategoryId = u.CategoryId,
-				Description = u.Description,
-				SeoAlias = u.SeoAlias,
-				Title = u.Title
-			}).ToListAsync();
+			var knowledgeBasevms = await knowledgeBases.Take(take)
+				.Select(u => new KnowledgeBaseQuickVm()
+				{
+					Id = u.k.Id,
+					CategoryId = u.k.CategoryId,
+					Description = u.k.Description,
+					SeoAlias = u.k.SeoAlias,
+					Title = u.k.Title,
+					CategoryAlias = u.c.SeoAlias,
+					CategoryName = u.c.Name,
+					NumberOfVotes = u.k.NumberOfVotes,
+					CreateDate = u.k.CreateDate,
+					ViewCount = u.k.ViewCount
+				}).ToListAsync();
 
 			return Ok(knowledgeBasevms);
 		}
@@ -125,26 +140,32 @@ namespace KnowledgeSpace.BackendServer.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> GetPopularKnowledgeBases(int take)
 		{
-			var knowledgeBases = _context.KnowledgeBases
-				.OrderByDescending(x => x.ViewCount)
-				.Take(take);
+			var knowledgeBases = from k in _context.KnowledgeBases
+								 join c in _context.Categories on k.CategoryId equals c.Id
+								 orderby k.ViewCount descending
+								 select new { k, c };
 
-			var knowledgeBasevms = await knowledgeBases.Select(u => new KnowledgeBaseQuickVm()
-			{
-				Id = u.Id,
-				CategoryId = u.CategoryId,
-				Description = u.Description,
-				SeoAlias = u.SeoAlias,
-				Title = u.Title,
-				ViewCount = u.ViewCount
-			}).ToListAsync();
+			var knowledgeBasevms = await knowledgeBases.Take(take)
+				.Select(u => new KnowledgeBaseQuickVm()
+				{
+					Id = u.k.Id,
+					CategoryId = u.k.CategoryId,
+					Description = u.k.Description,
+					SeoAlias = u.k.SeoAlias,
+					Title = u.k.Title,
+					CategoryAlias = u.c.SeoAlias,
+					CategoryName = u.c.Name,
+					NumberOfVotes = u.k.NumberOfVotes,
+					CreateDate = u.k.CreateDate,
+					ViewCount = u.k.ViewCount
+				}).ToListAsync();
 
 			return Ok(knowledgeBasevms);
 		}
 
 		[HttpGet("filter")]
-		[ClaimRequirement(FunctionCode.CONTENT_KNOWLEDGEBASE, CommandCode.VIEW)]
-		public async Task<IActionResult> GetKnowledgeBasesPaging(string filter, int pageIndex, int pageSize)
+		[AllowAnonymous]
+		public async Task<IActionResult> GetKnowledgeBasesPaging(string filter, int? categoryId, int pageIndex, int pageSize)
 		{
 			var query = from k in _context.KnowledgeBases
 						join c in _context.Categories on k.CategoryId equals c.Id
@@ -152,6 +173,10 @@ namespace KnowledgeSpace.BackendServer.Controllers
 			if (!string.IsNullOrEmpty(filter))
 			{
 				query = query.Where(x => x.k.Title.Contains(filter));
+			}
+			if (categoryId.HasValue)
+			{
+				query = query.Where(x => x.k.CategoryId == categoryId.Value);
 			}
 			var totalRecords = await query.CountAsync();
 			var items = await query.Skip((pageIndex - 1) * pageSize)
@@ -163,12 +188,59 @@ namespace KnowledgeSpace.BackendServer.Controllers
 					Description = u.k.Description,
 					SeoAlias = u.k.SeoAlias,
 					Title = u.k.Title,
-					CategoryName = u.c.Name
+					CategoryAlias = u.c.SeoAlias,
+					CategoryName = u.c.Name,
+					NumberOfVotes = u.k.NumberOfVotes,
+					CreateDate = u.k.CreateDate,
+					ViewCount = u.k.ViewCount,
+					NumberOfComments = u.k.NumberOfComments
 				})
 				.ToListAsync();
 
 			var pagination = new Pagination<KnowledgeBaseQuickVm>
 			{
+				PageSize = pageSize,
+				PageIndex = pageIndex,
+				Items = items,
+				TotalRecords = totalRecords,
+			};
+			return Ok(pagination);
+		}
+
+		[HttpGet("tags/{labelId}")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetKnowledgeBasesByTagId(string labelId, int pageIndex, int pageSize)
+		{
+			var query = from k in _context.KnowledgeBases
+						join lik in _context.LabelInKnowledgeBases on k.Id equals lik.KnowledgeBaseId
+						join l in _context.Labels on lik.LabelId equals l.Id
+						join c in _context.Categories on k.CategoryId equals c.Id
+						where lik.LabelId == labelId
+						select new { k, l, c };
+
+			var totalRecords = await query.CountAsync();
+			var items = await query.Skip((pageIndex - 1) * pageSize)
+				.Take(pageSize)
+				.Select(u => new KnowledgeBaseQuickVm()
+				{
+					Id = u.k.Id,
+					CategoryId = u.k.CategoryId,
+					Description = u.k.Description,
+					SeoAlias = u.k.SeoAlias,
+					Title = u.k.Title,
+					CategoryAlias = u.c.SeoAlias,
+					CategoryName = u.c.Name,
+					NumberOfVotes = u.k.NumberOfVotes,
+					CreateDate = u.k.CreateDate,
+					NumberOfComments = u.k.NumberOfComments,
+					ViewCount = u.k.ViewCount
+				})
+				.ToListAsync();
+
+			var pagination = new Pagination<KnowledgeBaseQuickVm>
+			{
+				PageSize = pageSize,
+				PageIndex = pageIndex,
 				Items = items,
 				TotalRecords = totalRecords,
 			};
@@ -176,7 +248,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
 		}
 
 		[HttpGet("{id}")]
-		[ClaimRequirement(FunctionCode.CONTENT_KNOWLEDGEBASE, CommandCode.VIEW)]
+		[AllowAnonymous]
 		public async Task<IActionResult> GetById(int id)
 		{
 			var knowledgeBase = await _context.KnowledgeBases.FindAsync(id);
@@ -252,13 +324,52 @@ namespace KnowledgeSpace.BackendServer.Controllers
 			return BadRequest();
 		}
 
+		[HttpGet("{knowlegeBaseId}/labels")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetLabelsByKnowledgeBaseId(int knowlegeBaseId)
+		{
+			var query = from lik in _context.LabelInKnowledgeBases
+						join l in _context.Labels on lik.LabelId equals l.Id
+						orderby l.Name ascending
+						where lik.KnowledgeBaseId == knowlegeBaseId
+						select new { l.Id, l.Name };
+
+			var labels = await query.Select(u => new LabelVm()
+			{
+				Id = u.Id,
+				Name = u.Name
+			}).ToListAsync();
+
+			return Ok(labels);
+		}
+
+		[HttpPut("{id}/view-count")]
+		[AllowAnonymous]
+		public async Task<IActionResult> UpdateViewCount(int id)
+		{
+			var knowledgeBase = await _context.KnowledgeBases.FindAsync(id);
+			if (knowledgeBase == null)
+				return NotFound();
+			if (knowledgeBase.ViewCount == null)
+				knowledgeBase.ViewCount = 0;
+
+			knowledgeBase.ViewCount += 1;
+			_context.KnowledgeBases.Update(knowledgeBase);
+			var result = await _context.SaveChangesAsync();
+			if (result > 0)
+			{
+				return Ok();
+			}
+			return BadRequest();
+		}
+
 		#region Private methods
 
 		private static KnowledgeBaseVm CreateKnowledgeBaseVm(KnowledgeBase knowledgeBase)
 		{
 			return new KnowledgeBaseVm()
 			{
-				Id = knowledgeBase.CategoryId,
+				Id = knowledgeBase.Id,
 
 				CategoryId = knowledgeBase.CategoryId,
 
@@ -288,11 +399,11 @@ namespace KnowledgeSpace.BackendServer.Controllers
 
 				LastModifiedDate = knowledgeBase.LastModifiedDate,
 
-				NumberOfComments = knowledgeBase.CategoryId,
+				NumberOfComments = knowledgeBase.NumberOfComments,
 
-				NumberOfVotes = knowledgeBase.CategoryId,
+				NumberOfVotes = knowledgeBase.NumberOfVotes,
 
-				NumberOfReports = knowledgeBase.CategoryId,
+				NumberOfReports = knowledgeBase.NumberOfReports,
 			};
 		}
 
@@ -347,6 +458,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
 		{
 			foreach (var labelText in request.Labels)
 			{
+				if (labelText == null) continue;
 				var labelId = TextHelper.ToUnsignString(labelText.ToString());
 				var existingLabel = await _context.Labels.FindAsync(labelId);
 				if (existingLabel == null)
@@ -375,7 +487,10 @@ namespace KnowledgeSpace.BackendServer.Controllers
 
 			knowledgeBase.Title = request.Title;
 
-			knowledgeBase.SeoAlias = request.SeoAlias;
+			if (string.IsNullOrEmpty(request.SeoAlias))
+				knowledgeBase.SeoAlias = TextHelper.ToUnsignString(request.Title);
+			else
+				knowledgeBase.SeoAlias = request.SeoAlias;
 
 			knowledgeBase.Description = request.Description;
 
@@ -391,7 +506,8 @@ namespace KnowledgeSpace.BackendServer.Controllers
 
 			knowledgeBase.Note = request.Note;
 
-			knowledgeBase.Labels = string.Join(',', request.Labels);
+			if (request.Labels != null)
+				knowledgeBase.Labels = string.Join(',', request.Labels);
 		}
 
 		#endregion Private methods
