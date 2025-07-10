@@ -34,8 +34,8 @@ namespace KnowledgeSpace.BackendServer
 					Configuration.GetConnectionString("DefaultConnection")));
 			//2. Setup idetntity
 			services.AddIdentity<User, IdentityRole>()
-				.AddEntityFrameworkStores<ApplicationDbContext>();
-
+				.AddEntityFrameworkStores<ApplicationDbContext>()
+				.AddDefaultTokenProviders();
 
 			var builder = services.AddIdentityServer(options =>
 			{
@@ -51,6 +51,7 @@ namespace KnowledgeSpace.BackendServer
 		.AddAspNetIdentity<User>()
 		.AddProfileService<IdentityProfileService>()
 		.AddDeveloperSigningCredential();
+
 
 			services.AddCors(options =>
 			{

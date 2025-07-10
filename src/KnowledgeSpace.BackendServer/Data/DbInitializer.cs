@@ -51,8 +51,8 @@ namespace KnowledgeSpace.BackendServer.Data
 					Id = Guid.NewGuid().ToString(),
 					UserName = "admin",
 					FirstName = "Quản trị",
-					LastName = "1",
-					Email = "tedu.international@gmail.com",
+					LastName = "website",
+					Email = "datcds04@gmail.com",
 					LockoutEnabled = false
 				}, "Admin@123");
 				if (result.Succeeded)
