@@ -1,0 +1,75 @@
+﻿@model TX2.Models.SanPham
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Xóa</h2>
+
+<h3>Bạn có chắc chắn muốn xóa sản phẩm này chứ?</h3>
+<div>
+    <h4>Sản phẩm</h4>
+    <hr />
+    <table>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.HangSanXuat.TenHang)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.HangSanXuat.TenHang)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.TenSP)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.TenSP)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.SoLuong)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.SoLuong)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.DonGia)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.DonGia)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <img src="@Url.Content("~/images" + Model.HinhAnh)" class="image" />
+
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.HinhAnh)
+            </td>
+        </tr>
+    </table>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Quay lại", "Index")
+        </div>
+    }
+</div>

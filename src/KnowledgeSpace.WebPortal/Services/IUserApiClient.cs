@@ -7,6 +7,7 @@ namespace KnowledgeSpace.WebPortal.Services
 	public interface IUserApiClient
 	{
 		Task<UserVm> GetById(string id);
+		Task<UserPublicVm> GetPublicProfile(string id);
 
 		Task<Pagination<KnowledgeBaseQuickVm>> GetKnowledgeBasesByUserId(string userId, int pageIndex, int pageSize);
 	}

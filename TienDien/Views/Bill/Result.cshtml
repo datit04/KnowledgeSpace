@@ -1,0 +1,26 @@
+﻿@model TienDien.Models.ElectricityBill
+
+@{
+    ViewBag.Title = "Kết Quả Tính Tiền Điện";
+}
+
+<link href="~/Content/site.css" rel="stylesheet" type="text/css" />
+
+<div class="container">
+    <h2>Kết quả:</h2>
+    <table class="table">
+        <tr>
+            <td class="label">Chủ hộ:</td>
+            <td>@Model.CustomerName</td>
+        </tr>
+        <tr>
+            <td class="label">Số điện tiêu thụ:</td>
+            <td>@Model.Consumption KW</td>
+        </tr>
+        <tr>
+            <td class="label">Tiền phải trả:</td>
+            <td>@Model.TotalAmount.ToString("N0") Đồng</td>
+        </tr>
+    </table>
+    <p>Biệt rằng: dùng giá điện "@Model.UsageType" để tính hóa đơn.</p>
+</div>

@@ -5,10 +5,10 @@
 
             <div class="span3">
                 <section class="widget">
-                    <h3 class="title">How it works</h3>
+                    <h3 class="title">Cách hoạt động của Knowledgebase</h3>
                     <div class="textwidget">
-                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. </p>
-                        <p>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. </p>
+                        <p>Knowledgebase là nền tảng chia sẻ tri thức, giúp người dùng truy cập và đóng góp vào kho tài liệu đa dạng về nhiều chủ đề. Hệ thống được thiết kế để cung cấp thông tin chính xác, dễ tiếp cận và cập nhật liên tục.</p>
+                        <p>Người dùng có thể tìm kiếm tài liệu, bài viết chuyên sâu, hoặc tham gia cộng đồng để thảo luận và chia sẻ kiến thức. Với giao diện thân thiện và tính năng tìm kiếm thông minh, Knowledgebase giúp bạn khám phá thông tin một cách dễ dàng.</p>
                     </div>
                 </section>
             </div>
@@ -17,7 +17,7 @@
                 <section class="widget">
                     <h3 class="title">Danh mục</h3>
                     <ul>
-                        @foreach (var item in Model)
+                        @foreach (var item in Model.OrderByDescending(x => x.Id).Take(6))
                         {
                             <li><a href="/cat/@item.SeoAlias-@item.Id">@item.Name</a></li>
                         }

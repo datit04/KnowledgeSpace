@@ -1,0 +1,66 @@
+﻿@model IEnumerable<TX2.Models.SanPham>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Trang quản trị sản phẩm</h2>
+
+<p>
+    @Html.ActionLink("Tạo mới", "Create")
+</p>
+
+@using (Html.BeginForm("Index", "SanPhams", FormMethod.Post, new { enctype = "multipath/form-data" }))
+    {
+    <div class="input-group my-3">
+        <input type="text" name="searchString" class="form-control" value="@Request["searchString"]"/>
+        <input type="submit" name="name" class="btn btn-primary" value="Tìm kiếm"/>
+    </div>
+    <div class="text-danger">@ViewBag.msg</div>
+}
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.HangSanXuat.TenHang)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TenSP)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SoLuong)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DonGia)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.HinhAnh)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.HangSanXuat.TenHang)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TenSP)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SoLuong)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DonGia)
+        </td>
+        <td>
+            <img src="@Url.Content("~/images" + item.HinhAnh)" class="image"/>
+        </td>
+        <td>
+            @Html.ActionLink("Sửa", "Edit", new { id=item.MaSP }) |
+            @Html.ActionLink("Chi tiết", "Details", new { id=item.MaSP }) |
+            @Html.ActionLink("Xóa", "Delete", new { id=item.MaSP })
+        </td>
+    </tr>
+}
+
+</table>

@@ -13,11 +13,11 @@
     </script>
 }
 <input type="hidden" id="hid_knowledge_base_id" value="@Model.Detail.Id" />
-@if (User.Identity.IsAuthenticated)
-{
-    <input type="hidden" id="hid_current_login_name" value="@Model.CurrentUser.FirstName @Model.CurrentUser.LastName" />
+@* @if (User.Identity.IsAuthenticated) *@
+@* { *@
+@*     <input type="hidden" id="hid_current_login_name" value="@Model.CurrentUser.FirstName @Model.CurrentUser.LastName" /> *@
 
-}
+@* } *@
 <div class="span8 page-content">
 
     <ul class="breadcrumb">
@@ -100,14 +100,15 @@
                 </div>
 
                 <form action="/knowledgebase/addNewComment" method="post" id="commentform">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" name="knowledgeBaseId" value="@Model.Detail.Id" />
-                    <p class="comment-notes">Your email address will not be published. Required fields are marked <span class="required">*</span></p>
+                    <p class="comment-notes">Địa chỉ email của bạn sẽ không được công bố. Các trường bắt buộc được đánh dấu <span class="required">*</span></p>
                     <div>
                         <label for="comment">Bình luận</label>
                         <textarea class="span8" name="content" id="txt_new_comment_content" cols="58" rows="10"></textarea>
                     </div>
 
-                    <p class="allowed-tags">You can use these HTML tags and attributes <small><code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></small></p>
+                    <p class="allowed-tags">Bạn có thể sử dụng các thẻ và thuộc tính HTML này <small><code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></small></p>
 
                     <div>
                         <input class="btn" name="submit" type="submit" id="btn_send_comment" value="Gửi bình luận">
@@ -134,7 +135,7 @@
             <div class="comment-meta">
 
                 <h5 class="author">
-                    <cite class="fn">{{ownerName}}</cite>
+                    <cite class="fn">@Model.OwnerFullName</cite>
                     - <a class="comment-reply-link" href="#">Trả lời</a>
                 </h5>
 

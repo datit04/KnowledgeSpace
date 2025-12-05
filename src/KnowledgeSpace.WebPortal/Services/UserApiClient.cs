@@ -23,5 +23,10 @@ namespace KnowledgeSpace.WebPortal.Services
 			var apiUrl = $"/api/users/{userId}/knowledgeBases?pageIndex={pageIndex}&pageSize={pageSize}";
 			return await GetAsync<Pagination<KnowledgeBaseQuickVm>>(apiUrl, true);
 		}
+
+		public async Task<UserPublicVm> GetPublicProfile(string id)
+		{
+			return await GetAsync<UserPublicVm>($"/api/users/public/{id}", false);
+		}
 	}
 }
