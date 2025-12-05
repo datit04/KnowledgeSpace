@@ -1,0 +1,25 @@
+﻿@model ExamScoreApp.Models.ExamScore
+
+@{
+    ViewBag.Title = "Kết Quả Tính Điểm Thi";
+}
+
+<link href="~/Content/site.css" rel="stylesheet" type="text/css" />
+
+<div class="container">
+    <h2>Kết quả:</h2>
+    <table class="table">
+        <tr>
+            <td class="label">Họ tên thí sinh:</td>
+            <td>@Model.CandidateName</td>
+        </tr>
+        <tr>
+            <td class="label">Tổng điểm:</td>
+            <td>@Model.TotalScore</td>
+        </tr>
+        <tr>
+            <td class="label">Kết quả:</td>
+            <td>@Model.Result</td>
+        </tr>
+    </table>
+</div>

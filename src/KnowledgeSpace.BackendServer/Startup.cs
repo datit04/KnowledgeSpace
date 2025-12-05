@@ -86,6 +86,7 @@ namespace KnowledgeSpace.BackendServer
 			services.AddControllersWithViews()
 				.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RoleCreateRequestValidator>());
 
+
 			services.AddAuthentication()
 			   .AddLocalApi("Bearer", option =>
 			   {
@@ -119,6 +120,7 @@ namespace KnowledgeSpace.BackendServer
 			services.AddTransient<IStorageService, FileStorageService>();
 			services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
 			services.AddTransient<IViewRenderService, ViewRenderService>();
+
 
 			services.AddSwaggerGen(c =>
 			{

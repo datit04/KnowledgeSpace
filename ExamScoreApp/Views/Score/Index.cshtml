@@ -1,0 +1,61 @@
+﻿@model ExamScoreApp.Models.ExamScore
+
+@{
+    ViewBag.Title = "Nhập Điểm Thi";
+}
+
+<link href="~/Content/site.css" rel="stylesheet" type="text/css" />
+
+<div class="container">
+    @using (Html.BeginForm("Calculate", "Score", FormMethod.Post))
+    {
+        <table class="table">
+            <tr>
+                <td colspan="3"; style="text-align:center">NHẬP ĐIỂM THI</td>
+            </tr>
+            <tr>
+                <td class="label">Họ tên thí sinh:</td>
+                <td>
+                    @Html.TextBoxFor(m => m.CandidateName, new { @class = "textbox" })
+                </td>
+                <td>
+                    @Html.CheckBoxFor(m => m.IsPolicyFamily) <span class="checkbox">Gia đình chính sách</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Chọn khu vực:</td>
+                <td>
+                    @Html.DropDownListFor(m => m.Area, new SelectList(new[] { "Khu vực A", "Khu vực B", "Khu vực C" }), new { @class = "dropdown" })
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">Vào điểm Toán:</td>
+                <td>
+                    @Html.TextBoxFor(m => m.MathScore, new { @class = "textbox" })
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">Vào điểm Lý:</td>
+                <td>
+                    @Html.TextBoxFor(m => m.PhysicsScore, new { @class = "textbox" })
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">Vào điểm Hóa:</td>
+                <td>
+                    @Html.TextBoxFor(m => m.ChemistryScore, new { @class = "textbox" })
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: center;">
+                    <input type="submit" value="TÍNH" class="button" />
+                </td>
+            </tr>
+        </table>
+    }
+    @Html.ValidationSummary(false)
+</div>

@@ -6,6 +6,7 @@ using KnowledgeSpace.BackendServer.Helpers;
 using KnowledgeSpace.ViewModels;
 using KnowledgeSpace.ViewModels.Contents;
 using KnowledgeSpace.ViewModels.Systems;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ namespace KnowledgeSpace.BackendServer.Controllers
 			_context = context;
 		}
 
+
 		[HttpPost]
 		[ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.CREATE)]
 		[ApiValidationFilter]
@@ -43,15 +45,24 @@ namespace KnowledgeSpace.BackendServer.Controllers
 				PhoneNumber = request.PhoneNumber,
 				CreateDate = DateTime.Now,
 			};
+
 			var result = await _userManager.CreateAsync(user, request.Password);
-			if (result.Succeeded)
-			{
-				return CreatedAtAction(nameof(GetById), new { id = user.Id }, request);
-			}
-			else
-			{
+			if (!result.Succeeded)
 				return BadRequest(new ApiBadRequestResponse(result));
+
+			// LẤY ROLE "Member" TỪ DB
+			var memberRole = await _roleManager.FindByNameAsync("Member");
+			if (memberRole == null)
+			{
+				// Nếu role chưa tồn tại → tạo mới
+				memberRole = new IdentityRole("Member");
+				await _roleManager.CreateAsync(memberRole);
 			}
+
+			// GÁN ROLE CHO USER
+			await _userManager.AddToRoleAsync(user, memberRole.Name);
+
+			return CreatedAtAction(nameof(GetById), new { id = user.Id }, request);
 		}
 
 		[HttpGet]
@@ -73,6 +84,22 @@ namespace KnowledgeSpace.BackendServer.Controllers
 			}).ToListAsync();
 
 			return Ok(uservms);
+		}
+
+		[HttpGet("public/{id}")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetPublicProfile(string id)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null) return NotFound();
+
+			return Ok(new
+			{
+				user.Id,
+				user.UserName,
+				FullName = $"{user.FirstName} {user.LastName}".Trim(),
+				user.CreateDate
+			});
 		}
 
 		[HttpGet("filter")]

@@ -11,5 +11,6 @@ namespace KnowledgeSpace.WebPortal.Models
 		public List<LabelVm> Labels { get; set; }
 
 		public UserVm CurrentUser { get; set; }
+		public string OwnerFullName { get; set; }
 	}
 }

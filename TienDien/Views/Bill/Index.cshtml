@@ -1,0 +1,54 @@
+﻿@model TienDien.Models.ElectricityBill
+
+@{
+    ViewBag.Title = "Tính Tiền Điện";
+}
+
+<div style="width: 400px; margin: 20px auto; font-family: Arial;">
+    @using (Html.BeginForm("Calculate", "Bill", FormMethod.Post))
+    {
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td colspan="3" style="padding: 5px; border: 1px solid #ccc; text-align: center;">
+                    TÍNH TIỀN ĐIỆN
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 5px; border: 1px solid #ccc; width: 120px;">Họ tên chủ hộ:</td>
+                <td style="padding: 5px; border: 1px solid #ccc;">
+                    @Html.TextBoxFor(m => m.CustomerName, new { @style = "width: 150px;" })
+                </td>
+                <td style="padding: 5px; border: 1px solid #ccc;">
+                    @Html.CheckBoxFor(m => m.IsPriority) Hộ ưu tiên
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 5px; border: 1px solid #ccc;">Loại điện tiêu thụ:</td>
+                <td style="padding: 5px; border: 1px solid #ccc;">
+                    @Html.DropDownListFor(m => m.UsageType, new SelectList(new[] { "Sinh hoạt", "Kinh doanh", "Sản xuất" }), new { @style = "width: 150px;" })
+                </td>
+                <td style="padding: 5px; border: 1px solid #ccc;"></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px; border: 1px solid #ccc;">Vào chỉ số cũ:</td>
+                <td style="padding: 5px; border: 1px solid #ccc;">
+                    @Html.TextBoxFor(m => m.OldIndex, new { @style = "width: 100px;" }) KW
+                </td>
+                <td style="padding: 5px; border: 1px solid #ccc;"></td>
+            </tr>
+            <tr>
+                <td style="padding: 5px; border: 1px solid #ccc;">Vào chỉ số mới:</td>
+                <td style="padding: 5px; border: 1px solid #ccc;">
+                    @Html.TextBoxFor(m => m.NewIndex, new { @style = "width: 100px;" }) KW
+                </td>
+                <td style="padding: 5px; border: 1px solid #ccc;"></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding: 5px; border: 1px solid #ccc; text-align: center;">
+                    <input type="submit" value="TÍNH" style="width: 100px; padding: 5px; font-size: 14px;" />
+                </td>
+            </tr>
+        </table>
+    }
+    @Html.ValidationSummary(false)
+</div>

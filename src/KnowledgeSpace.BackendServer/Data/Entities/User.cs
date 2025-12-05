@@ -11,7 +11,7 @@ namespace KnowledgeSpace.BackendServer.Data.Entities
 		}
 
 		public User(string id, string userName, string firstName, string lastName,
-			string email, string phoneNumber, DateTime dob)
+					string email, string phoneNumber, DateTime dob)
 		{
 			Id = id;
 			UserName = userName;
@@ -24,20 +24,19 @@ namespace KnowledgeSpace.BackendServer.Data.Entities
 
 		[MaxLength(50)]
 		[Required]
-		public string FirstName { get; set; }
+		public string FirstName { get; set; } = default!;
 
 		[MaxLength(50)]
 		[Required]
-		public string LastName { get; set; }
+		public string LastName { get; set; } = default!;
 
 		[Required]
 		public DateTime Dob { get; set; }
 
 		public int? NumberOfKnowledgeBases { get; set; }
-
 		public int? NumberOfVotes { get; set; }
-
 		public int? NumberOfReports { get; set; }
+
 		public DateTime CreateDate { get; set; }
 		public DateTime? LastModifiedDate { get; set; }
 	}

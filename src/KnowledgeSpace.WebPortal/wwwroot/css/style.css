@@ -16,7 +16,7 @@
 
 	.body-section a.new-kb {
 		width: 90%;
-		height: 32px;
+		height: 25px;
 		font-size: 20px;
 		padding: 14px 10px 10px 10px;
 	}
@@ -48,3 +48,4 @@
 	cursor: pointer;
 	padding: 0;
 }
+

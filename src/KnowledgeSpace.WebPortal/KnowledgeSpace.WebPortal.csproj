@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
     <Content Remove="wwwroot\js\controllers\accountController.js" />
   </ItemGroup>
 

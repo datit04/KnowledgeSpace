@@ -1,5 +1,4 @@
 ﻿using KnowledgeSpace.ViewModels.Contents;
-using KnowledgeSpace.WebPortal.Extensions;
 using KnowledgeSpace.WebPortal.Models;
 using KnowledgeSpace.WebPortal.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -68,6 +67,8 @@ namespace KnowledgeSpace.WebPortal.Controllers
 		public async Task<IActionResult> Details(int id)
 		{
 			var knowledgeBase = await _knowledgeBaseApiClient.GetKnowledgeBaseDetail(id);
+			if (knowledgeBase == null) return NotFound();
+
 			var category = await _categoryApiClient.GetCategoryById(knowledgeBase.CategoryId);
 			var labels = await _knowledgeBaseApiClient.GetLabelsByKnowledgeBaseId(id);
 
@@ -77,10 +78,17 @@ namespace KnowledgeSpace.WebPortal.Controllers
 				Category = category,
 				Labels = labels
 			};
-			if (User.Identity.IsAuthenticated)
-			{
-				viewModel.CurrentUser = await _userApiClient.GetById(User.GetUserId());
-			}
+
+			// LẤY TÊN NGƯỜI TẠO BÀI (OWNER) → DÙNG API PUBLIC
+			var owner = await _userApiClient.GetPublicProfile(knowledgeBase.OwnerUserId);
+			viewModel.OwnerFullName = owner?.FullName ?? "Ẩn danh";
+
+			// XÓA HOẶC BỎ QUA: Không cần thông tin current user để hiển thị tên
+			// if (User.Identity.IsAuthenticated)
+			// {
+			//     viewModel.CurrentUser = await _userApiClient.GetById(User.GetUserId());
+			// }
+
 			await _knowledgeBaseApiClient.UpdateViewCount(id);
 			return View(viewModel);
 		}

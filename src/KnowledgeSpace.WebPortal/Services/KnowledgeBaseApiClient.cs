@@ -152,6 +152,11 @@ namespace KnowledgeSpace.WebPortal.Services
 			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 			var response = await client.PutAsync($"/api/knowledgeBases/{id}", requestContent);
+			if (!response.IsSuccessStatusCode)
+			{
+				var errorContent = await response.Content.ReadAsStringAsync();
+				Console.WriteLine($"Lỗi: {(int)response.StatusCode} - {errorContent}");
+			}
 			return response.IsSuccessStatusCode;
 		}
 

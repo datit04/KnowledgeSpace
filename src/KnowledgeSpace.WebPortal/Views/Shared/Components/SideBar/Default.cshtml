@@ -36,7 +36,7 @@
     <section class="widget">
         <h3 class="title">Danh mục</h3>
         <ul>
-            @foreach (var item in Model.Categories)
+            @foreach (var item in Model.Categories.OrderByDescending(x => x.Id).Take(6))
             {
                 <li><a href="/cat/@item.SeoAlias-@item.Id">@item.Name</a></li>
             }

@@ -28,5 +28,6 @@ namespace KnowledgeSpace.BackendServer.Data.Entities
 		public int? ParentId { get; set; }
 
 		public int? NumberOfTickets { get; set; }
+
 	}
 }
